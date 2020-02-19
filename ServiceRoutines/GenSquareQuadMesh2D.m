@@ -4,8 +4,8 @@ function [VX, VY, K, EToV, BC] = GenSquareQuadMesh2D(Nx, Ny)
 % Purpose  : Generate 2D mesh on a square domain;   
 % written by Boris Bonev
 
-X = (-1:1/Nx:1);
-Y = (-1:1/Ny:1);
+X = (-1:2/Nx:1);
+Y = (-1:2/Ny:1);
 
 [VX, VY] = meshgrid(X,Y);
 Nv = length(VX);
