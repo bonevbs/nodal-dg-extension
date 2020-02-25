@@ -2,13 +2,12 @@ clear all
 
 % Driver script for solving the 2D Poisson equation
 Globals2D;
-GlobalsCG;
 
 % Polynomial order used for approximation
-N=1;
+N=2;
 
 % generate the mesh
-[VX, VY, K, EToV, BCType] = GenSquareQuadMesh2D(10, 10);
+[VX, VY, K, EToV, BCType] = GenSquareQuadMesh2D(20, 20);
 %[VX, VY, K, EToV] = GenCircleMesh2D(1/4);
 
 % Initialize solver and construct grid and metric
@@ -17,26 +16,39 @@ StartUp2D;
 % set up boundary conditions
 BuildBCMaps2D;
 
-% set up Dirichlet boundary conditions
-uD = zeros(Nfp*Nfaces, K);
-[uD(mapD),~,aD] = solution2(Fx(mapD),Fy(mapD));
+% Checkerboard pattern for solution 3
+EP = (1:K)';
+E1 = find( ( VX(EToV(EP, 1)) + VX(EToV(EP, 2)) + VX(EToV(EP, 3)) )/3 .* ( VY(EToV(EP, 1)) + VY(EToV(EP, 2)) + VY(EToV(EP, 3)) )/3 <= 0)';
+E2 = find( ( VX(EToV(EP, 1)) + VX(EToV(EP, 2)) + VX(EToV(EP, 3)) )/3 .* ( VY(EToV(EP, 1)) + VY(EToV(EP, 2)) + VY(EToV(EP, 3)) )/3 > 0)';
 
-% set up Neumann boundary conditions
-qN = zeros(Nfp*Nfaces, K);
-aN = c*ones(Nfp*Nfaces, K);
-%qN(mapN) = nx(mapN).*(pi*cos(pi*Fx(mapN)).*sin(pi*Fy(mapN))) + ...
-%           ny(mapN).*(pi*sin(pi*Fx(mapN)).*cos(pi*Fy(mapN))) ;
+a1 = 1; a2 = 20;
+a = ones(K,1);
+a(E1) = a1*a(E1);
+a(E2) = a2*a(E2);
+Ea = ones([size(x,1)],1)*a';
+Fa = Ea(Fmask(:), :);
+
 
 % Compute the stiffness and mass matrices
 %[A,M] = PoissonIPDG2D();
 [A,M] = HighContrastIPDG2D(a);
 
+% set up Dirichlet boundary conditions
+uD = zeros(Nfp*Nfaces, K);
+%[uD(mapD),~] = solution1(Fx(mapD),Fy(mapD));
+[uD(mapD),~] = solution3(Fx(mapD),Fy(mapD),Fa(mapD));
+
+% set up Neumann boundary conditions
+qN = zeros(Nfp*Nfaces, K);
+aN = ones(Nfp*Nfaces, K);
+
 % evaluate boundary condition contribution to rhs
 Aqbc = HighContrastIPDGbc2D(uD, qN, a, aN);
 
-% set up right hand side forcing
-[uExact,rhs] = solution2(x,y);
-rhs = c*MassMatrix*(J.*rhs) + Aqbc;
+% set up right hand side forcing and adjust according to the jump in a
+%[uExact,rhs] = solution1(x,y);
+[uExact,f] = solution3(x,y,Ea);
+rhs = MassMatrix*(J.*f) + Aqbc;
 
 % solve system
 u = A\rhs(:);
@@ -46,22 +58,7 @@ e = u(:) - uExact(:);
 fprintf("Relative L2 error: %e\n", sqrt( e'*M*e/(uExact(:)'*M*uExact(:)) ));
 
 % do some plotting
-[X,Y] = meshgrid(linspace(-1,1,20));
-Z = griddata(x,y,u,X,Y,'cubic');
-surf(X,Y,Z)
-%dt = delaunayTriangulation(x,y);
-%tri = dt.ConnectivityList ;
-%figure
-%trisurf(tri,x,y,u)
-%figure
-%scatter3(xCG, yCG, uCG)
-%uDG = zeros(K,Np);
-%uDG = uCG(gmap)';
-%clf
-%PlotMesh2D;
-%hold on
-%PlotAdaptiveContour2D(uDG,linspace(0,1,12),1e-1);
-%hold off
+SurfDG2D(u);
 
 % define analytical solutions
 function [u, f] = solution1(x,y)
@@ -75,4 +72,9 @@ end
 function [u, f] = solution2(x,y)
   u = x.^2 + y.^2;
   f = -4*ones(size(x));
+end
+
+function [u, f] = solution3(x,y,a)
+  u = sin(pi*x).*sin(pi*y)./a;
+  f = 2*pi^2*sin(pi*x).*sin(pi*y);
 end

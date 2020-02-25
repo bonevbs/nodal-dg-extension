@@ -5,10 +5,10 @@ Globals2D;
 GlobalsCG;
 
 % Polynomial order used for approximation
-N=1;
+N=25;
 
 % generate the mesh
-[VX, VY, K, EToV, BCType] = GenSquareQuadMesh2D(10, 10);
+[VX, VY, K, EToV, BCType] = GenSquareQuadMesh2D(1, 1);
 %[VX, VY, K, EToV] = GenCircleMesh2D(1/4);
 
 % Initialize DG solver and construct grid and metric
@@ -35,22 +35,7 @@ eCG = uCG - uExact;
 fprintf("Relative L2 error: %e\n", sqrt( eCG'*M*eCG/(uExact'*M*uExact) ));
 
 % do some plotting
-%[X,Y] = meshgrid(linspace(-1,1,100));
-%Z = griddata(xCG,yCG,uCG,X,Y,'cubic');
-%surf(X,Y,Z)
-dt = delaunayTriangulation(xCG,yCG) ;
-tri = dt.ConnectivityList ;
-figure
-trisurf(tri,xCG,yCG,uCG)
-%figure
-%scatter3(xCG, yCG, uCG)
-%uDG = zeros(K,Np);
-%uDG = uCG(gmap)';
-%clf
-%PlotMesh2D;
-%hold on
-%PlotAdaptiveContour2D(uDG,linspace(0,1,12),1e-1);
-%hold off
+SurfCG2D(uCG)
 
 % define analytical solutions
 function [u, f] = solution1(x,y)
