@@ -13,6 +13,6 @@ function SurfDG2D(u)
 
   dt = delaunayTriangulation(xDG(:),yDG(:));
   tri = dt.ConnectivityList;
-  figure
+  %figure
   trimesh(tri,xDG,yDG,u(:))
 return;

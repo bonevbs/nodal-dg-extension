@@ -43,6 +43,7 @@ for k1=1:K
     
     % coefficient for the interfacing element
     a2 = a(k2);
+    ah = 2*a1*a2/(a1+a2);
     
     fidM  = (k1-1)*Nfp*Nfaces + (f1-1)*Nfp + (1:Nfp);
     vidM = vmapM(fidM); Fm1 = mod(vidM-1,Np)+1;
@@ -68,15 +69,16 @@ for k1=1:K
         % nada 
       otherwise
 	% interior face variational terms
-	OP11        = OP11 + 0.5*( a1* gtau*mmE - a1* mmE*Dn1 - a1* Dn1'*mmE );
+  %OP11        = OP11 + 0.5*( a1* gtau*mmE - a1* mmE*Dn1 - a1* Dn1'*mmE );
+	OP11        = OP11 + 0.5*( ah* gtau*mmE - ah* mmE*Dn1 - ah* Dn1'*mmE );
 
 	OP12 = zeros(Np);
-	OP12(:,Fm2) =             - 0.5*( a2* gtau*mmE(:,Fm1) );
-	OP12(Fm1,:) = OP12(Fm1,:) - 0.5*( a2* mmE(Fm1,Fm1)*Dn2(Fm2,:) );
-  OP12(:,Fm2) = OP12(:,Fm2) - 0.5*(-sqrt(a1)*sqrt(a2)* Dn1'*mmE(:, Fm1) );
-  %OP12(:,Fm2) =             - 0.5*( a1* gtau*mmE(:,Fm1) );
+	%OP12(:,Fm2) =             - 0.5*( a2* gtau*mmE(:,Fm1) );
 	%OP12(Fm1,:) = OP12(Fm1,:) - 0.5*( a2* mmE(Fm1,Fm1)*Dn2(Fm2,:) );
-  %OP12(:,Fm2) = OP12(:,Fm2) - 0.5*(-sqrt(a1)*sqrt(a2)* Dn1'*mmE(:, Fm1) );
+  %OP12(:,Fm2) = OP12(:,Fm2) - 0.5*(-sqrt(a1*a2)* Dn1'*mmE(:, Fm1) );
+  OP12(:,Fm2) =             - 0.5*( ah* gtau*mmE(:,Fm1) );
+	OP12(Fm1,:) = OP12(Fm1,:) - 0.5*( ah* mmE(Fm1,Fm1)*Dn2(Fm2,:) );
+  OP12(:,Fm2) = OP12(:,Fm2) - 0.5*(-ah* Dn1'*mmE(:, Fm1) );
 	OP(entries(:), :) = [rows1(:), cols2(:), OP12(:)];
 	entries = entries + Np*Np;
 

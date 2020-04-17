@@ -1,4 +1,4 @@
-function [bc] = HighContrastIPDGbc2D(ubc,qbc,a,abc)
+function [bc] = HighContrastIPDGbc2D(ubc,qbc,a)
 
 % Purpose: Set up the discrete Poisson matrix directly
 %          using LDG. The operator is set up in the weak form
@@ -25,7 +25,8 @@ for k1=1:K
       
       % Local coefficients
       a1 = a(k1);
-      a2 = abc(fidM);
+      %a2 = abc(fidM);
+      %ah = 2*a1*a2/(a1+a2);
 
       id = 1+(f1-1)*Nfp + (k1-1)*Nfp*Nfaces;
       lnx = nx(id);  lny = ny(id); lsJ = sJ(id); hinv = Fscale(id);
@@ -41,7 +42,7 @@ for k1=1:K
 	    case {Dirichlet}
 	      bc(:,k1) = bc(:,k1) + ( a1* gtau*mmE(:,Fm1) - a1* Dn1'*mmE(:,Fm1))*ubc(fidM);
 		case {Neuman}
-	      bc(:,k1) = bc(:,k1) + a2* mmE(:,Fm1)*qbc(fidM);
+	      bc(:,k1) = bc(:,k1) + a1* mmE(:,Fm1)*qbc(fidM);
 		otherwise
 	  end 
     end   

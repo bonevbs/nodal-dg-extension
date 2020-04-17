@@ -1,4 +1,4 @@
-function [VX, VY, K, EToV] = GenCircleMesh2D(h0)
+function [VX, VY, K, EToV, BC] = GenCircleMesh2D(h0)
 
 % function [VX, VY, K, EToV] = MeshGenDistMesh2D()
 % Purpose  : Generate 2D square mesh using DistMesh;   
@@ -17,7 +17,7 @@ Bbox = [-1 -1; 1 1];
 param = [];
 
 % Call distmesh
-[Vert,EToV]=distmesh2d(fd,fh,h0,Bbox,param);
+[Vert,EToV]=distmesh2d(fd,fh,1/h0,Bbox,param);
 VX = Vert(:,1); VY = Vert(:,2);
 Nv = length(VX); K  = size(EToV,1);
 
@@ -30,4 +30,26 @@ D = (ax-cx).*(by-cy)-(bx-cx).*(ay-cy);
 i = find(D<0);
 EToV(i,:) = EToV(i,[1 3 2]);
 VX = VX'; VY = VY';
+
+% Boundary conditions
+[EToE,EToF]= tiConnect2D(EToV);
+
+% Dirichlet BC flag
+Dirichlet = 6;
+
+% initialize BC flags
+BC = zeros(K,3);
+
+% loop over elements
+for i=1:K
+    
+    % loop over faces
+    for j=1:3
+        
+        % if no neighbor
+        if (EToE(i,j) == i)
+            BC(i,j) = Dirichlet;
+        end
+    end
+end
 return

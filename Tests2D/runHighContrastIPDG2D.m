@@ -40,10 +40,10 @@ uD = zeros(Nfp*Nfaces, K);
 
 % set up Neumann boundary conditions
 qN = zeros(Nfp*Nfaces, K);
-aN = ones(Nfp*Nfaces, K);
+%aN = ones(Nfp*Nfaces, K);
 
 % evaluate boundary condition contribution to rhs
-Aqbc = HighContrastIPDGbc2D(uD, qN, a, aN);
+Aqbc = HighContrastIPDGbc2D(uD, qN, a);
 
 % set up right hand side forcing and adjust according to the jump in a
 %[uExact,rhs] = solution1(x,y);
