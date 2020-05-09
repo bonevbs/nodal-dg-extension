@@ -1,8 +1,17 @@
-function [VX, VY, K, EToV, BC] = GenSquareQuadMesh2D(Nx, Ny)
+function [VX, VY, K, EToV, BC] = GenSquareQuadMesh2D(Nx, Ny, varargin)
 
 % function [VX, VY, K, EToV, BCType] = GenSquareQuadMesh2D(h0)
 % Purpose  : Generate 2D mesh on a square domain;   
 % written by Boris Bonev
+
+BCType = 'Dirichlet'; % Use Dirichlet by default
+if nargin > 2
+    if strcmp(varargin{1}, 'Dirichlet') || strcmp(varargin{1}, 'Neumann') || strcmp(varargin{1}, 'corner')
+      BCType = varargin{1};
+    else
+      error('GenSquareQuadMesh2D: Unknown boundary type specified.')
+    end
+end
 
 X = (-1:2/Nx:1);
 Y = (-1:2/Ny:1);
@@ -22,14 +31,8 @@ D = (ax-cx).*(by-cy)-(bx-cx).*(ay-cy);
 i = find(D<0);
 EToV(i,:) = EToV(i,[1 3 2]);
 
-% flatten the coordinate vectors
-VX = VX(:)';  VY = VY(:)';
-
 % Boundary conditions
 [EToE,EToF]= tiConnect2D(EToV);
-
-% Dirichlet BC flag
-Dirichlet = 6;
 
 % initialize BC flags
 BC = zeros(K,3);
@@ -37,14 +40,27 @@ BC = zeros(K,3);
 % loop over elements
 for i=1:K
     
-    % loop over faces
-    for j=1:3
+  % loop over faces
+  for j=1:3
         
-        % if no neighbor
-        if (EToE(i,j) == i)
-            BC(i,j) = Dirichlet;
+    % if no neighbor
+    if (EToE(i,j) == i)
+      if strcmp(BCType, 'Dirichlet')
+        BC(i,j) = 6;
+      elseif strcmp(BCType, 'Neumann')
+        BC(i,j) = 7;
+      elseif strcmp(BCType, 'corner')
+        if any(VX(EToV(i,1:3)) == -1) || any(VY(EToV(i,1:3)) == -1)
+          BC(i,j) = 6;
+        else
+          BC(i,j) = 7;
         end
+      end
     end
+  end
 end
+
+% flatten the coordinate vectors
+VX = VX(:)';  VY = VY(:)';
 
 return
