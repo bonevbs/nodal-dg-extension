@@ -1,7 +1,7 @@
 function [gmap, nTotal, nFree, nBoundary] = BuildGlobalMaps2D()
 
 Globals2D;
-GlobalsCG;
+GlobalsCG2D;
 
 % this matrix stores nodes that are doubled in the form of a connectivity
 % matrix
@@ -47,5 +47,9 @@ gmap = reshape(gmap, [Np,K])';
 % create weighting vector to account for algebraic count of each node
 %cmap = sum(gmap(:) == gmap(:)');
 %cmap = reshape(cmap, [Np,K])';
+
+% compute grid points in CG enumeration
+xCG = zeros(nTotal,1); yCG = zeros(nTotal,1);
+xCG(gmap') = x; yCG(gmap') = y;
 
 end

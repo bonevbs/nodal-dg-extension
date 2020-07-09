@@ -14,5 +14,10 @@ function SurfDG2D(u)
   dt = delaunayTriangulation(xDG(:),yDG(:));
   tri = dt.ConnectivityList;
   %figure
-  trimesh(tri,xDG,yDG,u(:))
+  %trimesh(tri,xDG,yDG,u(:))
+  %trisurf(tri,xDG,yDG,u(:))
+  tricontf(xDG(:),yDG(:),tri,u(:), linspace(min(u(:)), max(u(:)), 20));
+  colormap(parula(20))
+  colorbar
+  %shading interp
 return;

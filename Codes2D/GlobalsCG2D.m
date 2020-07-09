@@ -2,3 +2,4 @@
 
 global nTotal nFree nBoundary
 global gmap cmap
+global xCG yCG

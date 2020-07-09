@@ -5,7 +5,7 @@ function [A,M] = PoissonCG2D()
 %          internal fluxes on symmetric form
 
 Globals2D;
-GlobalsCG;
+GlobalsCG2D;
 
 A = sparse(nTotal, nTotal);  M = sparse(nTotal, nTotal); 
 
