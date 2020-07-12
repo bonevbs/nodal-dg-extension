@@ -1,4 +1,4 @@
-function SurfDG2D(u)
+function QuiverDG2D(u, v)
 
 % function SurfDG2D(u)
 % Purpose: Plot DG solution. elements are scaled back by epsilon to allow
@@ -13,14 +13,5 @@ function SurfDG2D(u)
 
   dt = delaunayTriangulation(xDG(:),yDG(:));
   tri = dt.ConnectivityList;
-  %figure
-  trimesh(tri,xDG,yDG,u(:))
-  %h=trisurf(tri,xDG,yDG,u(:));
-  %set(h,'LineWidth',0.01)
-  [CS,h]=tricontf(xDG(:),yDG(:),tri,u(:), linspace(min(u(:)), max(u(:)), 20));
-  set(h,'edgecolor','none');
-  %set(h,'LineColor','none')
-  colormap(parula(20))
-  colorbar
-  %shading interp
+  triquiver(tri,xDG,yDG,u(:),v(:));
 return;

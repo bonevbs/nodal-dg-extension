@@ -6,7 +6,8 @@ function [VX, VY, K, EToV, BC] = GenSquareQuadMesh2D(Nx, Ny, varargin)
 
 BCType = 'Dirichlet'; % Use Dirichlet by default
 if nargin > 2
-    if strcmp(varargin{1}, 'Dirichlet') || strcmp(varargin{1}, 'Neumann') || strcmp(varargin{1}, 'corner')
+    if strcmp(varargin{1}, 'Dirichlet') || strcmp(varargin{1}, 'Neumann')...
+        || strcmp(varargin{1}, 'corner') || strcmp(varargin{1}, 'channel')
       BCType = varargin{1};
     else
       error('GenSquareQuadMesh2D: Unknown boundary type specified.')
@@ -54,6 +55,16 @@ for i=1:K
           BC(i,j) = 6;
         else
           BC(i,j) = 7;
+        end
+      elseif strcmp(BCType, 'channel')
+        if ( VX(EToV(i,j)) == -1 && VX(EToV(i,mod(j,3)+1)) == -1 ) ||...
+          ( VX(EToV(i,j)) == 1 && VX(EToV(i,mod(j,3)+1)) == 1 )
+          BC(i,j) = 6;
+        elseif ( VY(EToV(i,j)) == -1 && VY(EToV(i,mod(j,3)+1)) == -1 ) ||...
+          ( VY(EToV(i,j)) == 1 && VY(EToV(i,mod(j,3)+1)) == 1 )
+          BC(i,j) = 7;
+        else
+          error("Node should not be on the boundary.")
         end
       end
     end

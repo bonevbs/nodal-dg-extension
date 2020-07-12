@@ -3,13 +3,12 @@ pvals = [];
 hvals = [];
 
 for h = 2.^(2:5)
-for N = 1:4
+for N = 1:3
   % Driver script for solving the 2D Poisson equation
   Globals2D;
-  GlobalsCG2D;
 
   % generate the mesh
-  [VX, VY, K, EToV, BCType] = GenSquareQuadMesh2D(h, h);
+  [VX, VY, K, EToV, BCType] = GenSquareQuadMesh2D(h, h, 'Dirichlet');
   %[VX, VY, K, EToV] = GenCircleMesh2D(1/h);
 
   % Initialize DG solver and construct grid and metric
@@ -17,24 +16,37 @@ for N = 1:4
 
   % Compute translation maps that map DG data onto CG datastructures
   BuildGlobalMaps2D;
-
-  % Compute the stiffness and mass matrices
-  [A,M] = PoissonCG2D();
-
-  % compute grid points in CG enumeration
-  xCG = zeros(nTotal,1); yCG = zeros(nTotal,1);
-  xCG(gmap') = x; yCG(gmap') = y;
   
-  % compute exact solution for boundary conditions
-  [uExact, fExact] = solution1(xCG,yCG);
+  % Construct analytical solution
+  [uA, f] = solution1(x,y);
+
+  % Initialize solver and construct grid and metric
+  [A,M] = PoissonIPDG2D();
+  
+  % set up boundary conditions
+  uD = zeros(Nfp*Nfaces, K);
+  qN = zeros(Nfp*Nfaces, K);
+  
+  % compute rhs
+  Aqbc = PoissonIPDGbc2D(uD, qN);
+  rhs = MassMatrix*(J.*f) + Aqbc;
 
   % solve the numerical proble
-  u = A(1:nFree, 1:nFree) \ ( M(1:nFree, 1:nTotal)*fExact - A(1:nFree, nFree+1:nTotal)*uExact(nFree+1:nTotal) );
-  uCG = [u; uExact(nFree+1:nTotal)];
+  u = A\rhs(:);
+  uA = uA(:);
   
   % compute L2 error
-  eCG = uCG - uExact;
-  l2err = [l2err, sqrt( eCG'*M*eCG/(uExact'*M*uExact) )];
+  e = u - uA;
+  % comparison
+  close all
+  figure
+  SurfDG2D(reshape(u,Np,K));
+  figure
+  SurfDG2D(reshape(uA,Np,K));
+  figure
+  SurfDG2D(reshape(e,Np,K));
+  
+  l2err = [l2err, sqrt( e'*M*e/(uA'*M*uA) )];
   pvals = [pvals, N];
   hvals = [hvals, h];
 end

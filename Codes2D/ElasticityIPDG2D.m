@@ -71,7 +71,7 @@ for k1=1:K
     % matrix for off-diagonal entries
     OOXX = zeros(Np); OOXY = zeros(Np); OOYX = zeros(Np); OOYY = zeros(Np);
     
-    alpha = 10000*2*(N+1)*(N+1)*hinv;
+    alpha = 100*2*(N+1)*(N+1)*hinv;
     %alphaN = 100*2*(N+1)*(N+1)*hinv;
     %alphaT = 100*2*(N+1)*(N+1)*hinv;
     switch(BCType(k1,f1))
@@ -90,6 +90,12 @@ for k1=1:K
         ODYY = ODYY + alpha*mmE;
 
       case {Neuman} 
+        
+        % diagonal contributions of Term 2
+        ODXX = ODXX - 0.5*mmE*(2*Mu1*Dnxx1 + Mu1*Dnyy1 + Lambda1*Dnxx1);
+        ODXY = ODXY - 0.5*mmE*(Mu1*Dnyx1 + Lambda1*Dnxy1);
+        ODYX = ODYX - 0.5*mmE*(Mu1*Dnxy1 + Lambda1*Dnyx1);
+        ODYY = ODYY - 0.5*mmE*(Mu1*Dnxx1 + 2*Mu1*Dnyy1 + Lambda1*Dnyy1);
 
       otherwise
         

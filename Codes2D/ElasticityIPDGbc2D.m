@@ -39,8 +39,8 @@ for k1=1:K
           bcx(:,k1) = bcx(:,k1) + alpha*mmE(:,Fm1)*uxbc(fidM);
           bcy(:,k1) = bcy(:,k1) + alpha*mmE(:,Fm1)*uybc(fidM);
         case {Neuman}
-          bcx(:,k1) = bcx(:,k1) + 0.5*mmE(:,Fm1)*qxbc(fidM);
-          bcy(:,k1) = bcy(:,k1) + 0.5*mmE(:,Fm1)*qybc(fidM);
+          bcx(Fm1,k1) = bcx(Fm1,k1) + 0.5*mmE(Fm1,Fm1)*qxbc(fidM); %+ 0.5*mmE(Fm1,Fm1)*qybc(fidM);
+          bcy(Fm1,k1) = bcy(Fm1,k1) + 0.5*mmE(Fm1,Fm1)*qybc(fidM); %+ 0.5*mmE(Fm1,Fm1)*qybc(fidM);
         otherwise
       end
     end
