@@ -1,4 +1,4 @@
-function [bcx, bcy] = ElasticityIPDGbc2D(uxbc,uybc,qxbc,qybc)
+function [bcx, bcy] = ElasticityIPDGbc2D(uxbc,uybc,qxbc,qybc,mu,lambda)
 
 % Purpose: Set up the discrete Poisson matrix directly
 %          using LDG. The operator is set up in the weak form
@@ -33,7 +33,10 @@ for k1=1:K
       
       mmE = lsJ*massEdge(:,:,f1);
       
-      alpha = 100*2*(N+1)*(N+1)*hinv; % set penalty scaling
+      % originially 100
+      mu_avg = sum(mu(:,k1))/Np;
+      lambda_avg = sum(lambda(:,k1))/Np;
+      alpha = (lambda_avg+2*mu_avg)*2*(N+1)*(N+1)*hinv; % set penalty scaling
       switch(BCType(k1,f1))
         case {Dirichlet}
           bcx(:,k1) = bcx(:,k1) + alpha*mmE(:,Fm1)*uxbc(fidM);

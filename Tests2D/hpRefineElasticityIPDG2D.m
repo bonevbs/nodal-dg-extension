@@ -4,9 +4,9 @@ l2err = [];
 pvals = [];
 hvals = [];
 
-icase = 'forced 2';
+icase = 'forced 1';
 
-for h = 2.^(2:5)
+for h = 2.^(2:6)
   for p = 1:4
     clear global
     
@@ -39,7 +39,8 @@ for h = 2.^(2:5)
     
     switch icase
       case 'forced 1'
-        [uxA, uyA, fx, fy, mu, lambda] = solution1(x,y);
+        sel1 = ( VX(EToV(:, 1)) + VX(EToV(:, 2)) + VX(EToV(:, 3)) )/3 > 0.5;
+        [uxA, uyA, fx, fy, mu, lambda] = solution1(x,y,sel1);
         uxD(mapD) = uxA(vmapD);
         uyD(mapD) = uyA(vmapD);
       case 'forced 2'
@@ -105,23 +106,38 @@ hold off
 
 
 % define analytical solutions
-function [ux, uy, fx, fy, mu, lambda] = solution1(x,y)
-c = 1;
-muc = 1; mux = 1; muy = 1;
-lambdac = 1; lambdax = 1; lambday = 1;
+function [ux, uy, fx, fy, mu, lambda] = solution1(x,y,sel1)
+
+c = 0;
+
+muc0 = 1; mux0 = 0; muy0 = 0;
+muc1 = 10000; mux1 = 0; muy1 = 0;
+lambdac0 = 1; lambdax0 = 0; lambday0 = 0;
+lambdac1 = 10000; lambdax1 = 0; lambday1 = 0;
 ux = sin(pi*x).*sin(pi*y) + c;
 uy = sin(pi*x).*sin(pi*y) + c;
-mu = muc + mux*x + muy*y;
-lambda = lambdac + lambdax*x + lambday*y;
-fx = pi*lambdax*cos(pi*x).*sin(pi*y) + pi*lambdax*sin(pi*x).*cos(pi*y)...
+mu = muc0 + mux0*x + muy0*y;
+lambda = lambdac0 + lambdax0*x + lambday0*y;
+mu(:,sel1) = muc1 + mux1*x(:,sel1) + muy1*y(:,sel1);
+mux = mux0 * ones(size(x));
+mux(:,sel1) = mux1;
+muy = muy0 * ones(size(x));
+muy(:,sel1) = muy1;
+lambda(:,sel1) = lambdac1 + lambdax1*x(:,sel1) + muy1*y(:,sel1);
+lambdax = lambdax0 * ones(size(x));
+lambdax(:,sel1) = lambdax1;
+lambday = lambday0 * ones(size(x));
+lambday(:,sel1) = lambday1;
+
+fx = pi*lambdax.*cos(pi*x).*sin(pi*y) + pi*lambdax.*sin(pi*x).*cos(pi*y)...
   - pi^2*lambda.*sin(pi*x).*sin(pi*y) + pi^2*lambda.*cos(pi*x).*cos(pi*y)...
-  + 2*pi*mux*cos(pi*x).*sin(pi*y) - 2*pi^2*mu.*sin(pi*x).*sin(pi*y)...
-  + pi*muy*cos(pi*x).*sin(pi*y) + pi*muy*sin(pi*x).*cos(pi*y)...
+  + 2*pi*mux.*cos(pi*x).*sin(pi*y) - 2*pi^2*mu.*sin(pi*x).*sin(pi*y)...
+  + pi*muy.*cos(pi*x).*sin(pi*y) + pi*muy.*sin(pi*x).*cos(pi*y)...
   - pi^2*mu.*sin(pi*x).*sin(pi*y) + pi^2*mu.*cos(pi*x).*cos(pi*y);
-fy = pi*lambday*cos(pi*x).*sin(pi*y) + pi*lambday*sin(pi*x).*cos(pi*y)...
+fy = pi*lambday.*cos(pi*x).*sin(pi*y) + pi*lambday.*sin(pi*x).*cos(pi*y)...
   - pi^2*lambda.*sin(pi*x).*sin(pi*y) + pi^2*lambda.*cos(pi*x).*cos(pi*y)...
-  + 2*pi*muy*sin(pi*x).*cos(pi*y) - 2*pi^2*mu.*sin(pi*x).*sin(pi*y)...
-  + pi*mux*cos(pi*x).*sin(pi*y) + pi*mux*sin(pi*x).*cos(pi*y)...
+  + 2*pi*muy.*sin(pi*x).*cos(pi*y) - 2*pi^2*mu.*sin(pi*x).*sin(pi*y)...
+  + pi*mux.*cos(pi*x).*sin(pi*y) + pi*mux.*sin(pi*x).*cos(pi*y)...
   - pi^2*mu.*sin(pi*x).*sin(pi*y) + pi^2*mu.*cos(pi*x).*cos(pi*y);
 end
 

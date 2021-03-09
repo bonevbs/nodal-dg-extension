@@ -29,13 +29,9 @@ cx = VX(EToV(:,3)); cy = VY(EToV(:,3));
 D = (ax-cx).*(by-cy)-(bx-cx).*(ay-cy);
 i = find(D<0);
 EToV(i,:) = EToV(i,[1 3 2]);
-VX = VX'; VY = VY';
 
 % Boundary conditions
 [EToE,EToF]= tiConnect2D(EToV);
-
-% Dirichlet BC flag
-Dirichlet = 6;
 
 % initialize BC flags
 BC = zeros(K,3);

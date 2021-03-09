@@ -71,7 +71,11 @@ for k1=1:K
     % matrix for off-diagonal entries
     OOXX = zeros(Np); OOXY = zeros(Np); OOYX = zeros(Np); OOYY = zeros(Np);
     
-    alpha = 100*2*(N+1)*(N+1)*hinv;
+    % originally 100
+    mu_avg = 0.5*sum(mu(:,k1) + mu(:,k2))/Np;
+    lambda_avg = 0.5*sum(lambda(:,k1) + lambda(:,k2))/Np;
+    alpha = (lambda_avg+2*mu_avg)*2*(N+1)*(N+1)*hinv;
+    %alpha = 10000000*2*(N+1)*(N+1)*hinv;
     %alphaN = 100*2*(N+1)*(N+1)*hinv;
     %alphaT = 100*2*(N+1)*(N+1)*hinv;
     switch(BCType(k1,f1))
@@ -106,6 +110,8 @@ for k1=1:K
         ODYY = ODYY - 0.5*mmE*(Mu1*Dnxx1 + 2*Mu1*Dnyy1 + Lambda1*Dnyy1);
         
         % off-diagonal contribution of Term 2
+        %Muh = 2*Mu1(Fm1,Fm1).*Mu2(Fm2,Fm2).*diag(1./diag(Mu1(Fm1,Fm1)+Mu2(Fm2,Fm2)));
+        %Lambdah = 2*Lambda1(Fm1,Fm1).*Lambda2(Fm2,Fm2).*diag(1/diag(Lambda1(Fm1,Fm1)+Lambda2(Fm2,Fm2)));
         OOXX(Fm1,:) = OOXX(Fm1,:) - 0.5*mmE(Fm1,Fm1)*(2*Mu2(Fm2,Fm2)*Dnxx2(Fm2,:) + Mu2(Fm2,Fm2)*Dnyy2(Fm2,:) + Lambda2(Fm2,Fm2)*Dnxx2(Fm2,:));
         OOXY(Fm1,:) = OOXY(Fm1,:) - 0.5*mmE(Fm1,Fm1)*(Mu2(Fm2,Fm2)*Dnyx2(Fm2,:) + Lambda2(Fm2,Fm2)*Dnxy2(Fm2,:));
         OOYX(Fm1,:) = OOYX(Fm1,:) - 0.5*mmE(Fm1,Fm1)*(Mu2(Fm2,Fm2)*Dnxy2(Fm2,:) + Lambda2(Fm2,Fm2)*Dnyx2(Fm2,:));
