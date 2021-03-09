@@ -4,7 +4,8 @@ A simple extension for the nodal-dg code by Jan S. Hesthaven and Tim Warburton
 ## Description
 This library includes extensions to the original nodal-dg code by Jan S. Hesthaven and Tim Warburton. So far, these extensions include:
 * High-order continuous Galerkin (CG/FEM) method on triangular meshes using the nodal-dg datastructures
-* discontinuous Galerkin method for the high-contrast Poisson problem
+* DG method for the high-contrast Poisson problem
+* IPDG method for linear elasticity in 2D
 * Test routines designed to check behaviour under h- and p-refinement
 
 ## Setup
