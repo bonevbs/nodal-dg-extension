@@ -1,4 +1,4 @@
-# nodal-dg-extenstion
+# nodal-dg-extension
 A simple extension for the discontinuous Galerkin code [nodal-dg](https://github.com/tcew/nodal-dg) by Jan S. Hesthaven and Tim Warburton.
 
 ## Description
