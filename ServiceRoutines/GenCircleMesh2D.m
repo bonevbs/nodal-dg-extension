@@ -1,4 +1,4 @@
-function [VX, VY, K, EToV, BC] = GenCircleMesh2D(h0)
+function [VX, VY, K, EToV, BC] = GenCircleMesh2D(h0, varargin)
 
 % function [VX, VY, K, EToV] = MeshGenDistMesh2D()
 % Purpose  : Generate 2D square mesh using DistMesh;   
@@ -10,6 +10,21 @@ function [VX, VY, K, EToV, BC] = GenCircleMesh2D(h0)
 %    h0     Characteristic length of elements
 %    Bbox   Bounding box for mesh
 %    param  Parameters to be used in function call with DistMesh
+
+BCType = 'Dirichlet'; % Use Dirichlet by default
+if nargin > 1
+    if strcmp(varargin{1}, 'Dirichlet') || strcmp(varargin{1}, 'Neumann')...
+        || strcmp(varargin{1}, 'mixed')
+      BCType = varargin{1};
+    else
+      error('GenCircleMesh2D: Unknown boundary type specified.')
+    end
+end
+if strcmp(BCType, 'Dirichlet')
+  BCType = 6;
+else
+  BCType = 7;
+end
 
 fd = @(p) sqrt(sum(p.^2,2))-1;
 fh = @huniform;
@@ -44,8 +59,11 @@ for i=1:K
         
         % if no neighbor
         if (EToE(i,j) == i)
-            BC(i,j) = Dirichlet;
+            BC(i,j) = BCType;
         end
     end
 end
+
+% flatten the coordinate vectors
+VX = VX(:)';  VY = VY(:)';
 return
