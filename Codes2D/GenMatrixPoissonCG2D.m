@@ -25,9 +25,9 @@ BuildGlobalMaps2D;
 % set up rhs
 rhs = M(1:nFree, 1:nTotal)*fExact - A(1:nFree, nFree+1:nTotal)*uExact(nFree+1:nTotal);
 A = A(1:nFree, 1:nFree);
-u = A \ rhs;
-uCG = [u; uExact(nFree+1:nTotal)];
-SurfCG2D(uCG)
+%u = A \ rhs;
+%uCG = [u; uExact(nFree+1:nTotal)];
+%SurfCG2D(uCG)
 %uCG = [u; uExact(nFree+1:nTotal)];
 
 
@@ -35,7 +35,7 @@ elim_tree = GenElimTreeCG2D(nmax, 'PartitionMode', 'alternating');
 %[perm, iperm] = ElimTree2Perm(elim_tree, 'postorder');
 %figure
 %spy(A(perm,perm));
-VisualizeTreeCG2D(elim_tree);
+%VisualizeTreeCG2D(elim_tree);
 elim_tree = ElimTree2SequentialTree(elim_tree);
 
 

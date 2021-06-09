@@ -5,25 +5,16 @@ GlobalsCG2D;
 
 % this matrix stores nodes that are doubled in the form of a connectivity
 % matrix
-doubleNodes = sparse(vmapM, vmapP, ones(K*Nfaces*Nfp,1));%+ sparse(vmapP, vmapM, ones(K*Nfaces*Nfp,1));
+%doubleNodes = sparse(vmapM, vmapP, ones(K*Nfaces*Nfp,1));%+ sparse(vmapP, vmapM, ones(K*Nfaces*Nfp,1));
+G = graph(vmapM, vmapP);
 
 gmap = zeros(K*Np,1);
-assignedNodes = [];
 j = 1;
 % unique counting to build a global map of degrees of freedom
 for i=1:K*Np
-  if ismember(i, assignedNodes)
-  else
-    gmap(i) = j;
-    assignedNodes = [assignedNodes, i];
+  if gmap(i) == 0
     % go through all nodes corresponding to this node
-    equivNodes = setdiff(find(doubleNodes(i,:)), assignedNodes);
-    while ~isempty(equivNodes)
-      e = equivNodes(1);
-      gmap(e) = j;
-      assignedNodes = [assignedNodes, e];
-      equivNodes = setdiff(union(find(doubleNodes(e,:)),equivNodes), assignedNodes);
-    end
+    gmap(dfsearch(G,i)) = j;
     j=j+1;
   end
 end
